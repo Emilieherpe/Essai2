@@ -1,0 +1,85 @@
+<!-- https://github.com/jgbarah/aframe-playground/tree/master/moving-01 -->
+<!-- Fox : https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Fox -->
+<!-- animations : dans le gltf "name":  Walk / Survey / Run-->
+<!-- https://github.com/n5ro/aframe-extras/tree/master/src/loaders#animation
+     Event 	               Details 	            Description
+     - animation-loop 	   action, loopDelta 	Emitted when a single loop has finished.
+     - animation-finished  action, direction 	Emitted when all loops  have finished
+ -->
+ <!-- https://aframe.io/docs/1.0.0/core/component.html -->
+ <!DOCTYPE html>
+ <html>
+   <head>
+     <meta charset="UTF-8">
+     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js"></script>
+     <script src="https://unpkg.com/aframe-event-set-component@5.0.0/dist/aframe-event-set-component.min.js"></script>
+     <script src="https://ensaama-officiel-numerique.github.io/components/detect/detect.js"></script>
+     <script src="https://ensaama-officiel-numerique.github.io/components/debug/debug.js"></script>
+     <script>
+       var actions = ["etirement", "curieux.001", "assis"];
+       var dataRun = "clip: assis; crossFadeDuration: .3; repetitions : 2; timeScale: 1";
+       var dataWalk = "clip: curieux.001; crossFadeDuration: .3; repetitions : 2; timeScale: 1";
+       var dataSurvey = "clip: etirement; crossFadeDuration: .3; repetitions : 2; timeScale: 1";
+       var current = actions[3];
+ 
+       AFRAME.registerComponent('loaded', {
+         init: function () {
+             var el = this.el;
+             el.addEventListener('model-loaded', () => {
+                 console.log(">>> animation chargée : "+el.id);
+ 
+                 });
+             el.addEventListener('model-error', () => {
+                 console.log(">>> erreur chargement : "+el.id);
+             });
+         }
+       });
+ 
+       AFRAME.registerComponent('finished', {
+           update: function () {
+               var el = this.el;
+               el.addEventListener('animation-finished', () => {
+                   console.log(">>> animation terminée : "+el.id);
+                   el.removeAttribute("animation-mixer");
+ 
+                   var newIndex = Math.floor(Math.random() * actions.length);
+                   console.log(">>> "+newIndex+"_"+ actions[newIndex]);
+                   switch (newIndex) {
+                       case 0: maj = dataRun; break;
+                       case 1: maj = dataWalk; break;
+                       case 2: maj = dataSurvey; break;
+                       // default:
+                   }
+ 
+                   el.setAttribute("animation-mixer", maj );
+               });
+           }
+       });
+     </script>
+   </head>
+ 
+   <body>
+       <a-scene>
+         <a-assets>
+           <a-asset-item id="fox" src="chat.glb"></a-asset-item>
+         </a-assets>
+ 
+         <a-entity id="renard"
+                   position="-4 -2 -9"
+                   rotation="0 60 0"
+                   scale="1 1 1"
+                   gltf-model="#fox"
+                   animation-mixer="clip: etirement; repetitions : 2; duration: 2; "
+                   loaded
+                   finished>
+         </a-entity>
+ 
+         <a-sky color="grey"></a-sky>
+         <a-light type="ambient" color="white"></a-light>
+         <a-light type="point" intensity="1" position="-2 2 2"></a-light>
+       </a-scene>
+ 
+   </body>
+ </html>
+ 
